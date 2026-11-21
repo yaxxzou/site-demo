@@ -97,9 +97,9 @@
   }
   h1 .pron { font-size: 0.5em; font-weight: 400; color: var(--text-2); letter-spacing: 0; margin-left: 0.35em; }
   .intro { font-size: var(--fs); line-height: 1.55; }
-  .intro p { margin: 0 0 0.6em; }
+  .intro p { margin: 0 0 1em; }             /* a clear space between paragraphs */
   .intro p:last-child { margin-bottom: 0; }
-  .intro ul { list-style: none; margin: 0 0 0.6em; padding: 0; }
+  .intro ul { list-style: none; margin: -0.4em 0 1em; padding: 0; }   /* list stays close to its "My main research areas are:" line */
   .intro li { padding-left: 1.4em; position: relative; margin-bottom: 0.15em; }
   /* Bullets: small red squares (replacing the ✶ stars) */
   .intro li::before {
@@ -262,7 +262,6 @@
           <span class="chev" aria-hidden="true">›</span>
         </button>
         <ul class="sub" id="sub-research">
-          <li><a class="u-red" href="#">All Research Areas</a></li>
           <li><a class="u-red" href="#">Human-Technology Interaction</a></li>
           <li><a class="u-red" href="#">Cognitive Enhancement</a></li>
           <li><a class="u-red" href="#">Metacognition</a></li>
