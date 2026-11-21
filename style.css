@@ -1,0 +1,265 @@
+/* Sandra Grinschgl — design demo
+   Shared styles for every page. Page-specific parts are marked HOME and TOPIC PAGES. */
+
+:root {
+  --text: #1D1D1F;
+  --text-2: #6E6E73;
+  --line: #D2D2D7;
+  --band: #F5F5F7;
+  --red: #D6002B;
+  --link-line: #B8B8BE;
+  --fs: 18px;                          /* body text size; Home's fit script may lower it */
+  --bar-h: 48px;
+  --edge: clamp(24px, 4vw, 64px);      /* space between the window edge and the content */
+  --max: 1440px;                       /* on very wide screens everything centres */
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: var(--text);
+  background: #fff;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+a { color: inherit; text-decoration: none; }
+.wrap { max-width: var(--max); margin: 0 auto; padding-left: var(--edge); padding-right: var(--edge); width: 100%; }
+
+/* Red underline drawn as a background, so it can slide in */
+.u-red {
+  background-image: linear-gradient(var(--red), var(--red));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 2px;
+  transition: background-size 200ms ease;
+  padding-bottom: 3px;
+}
+
+/* ---------- Top bar ---------- */
+.bar { position: sticky; top: 0; z-index: 10; background: var(--band); height: var(--bar-h); flex: none; }
+.bar-inner { height: 100%; display: flex; align-items: center; justify-content: space-between; }
+.site-name { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
+nav { height: 100%; }
+.menu { display: flex; gap: 44px; list-style: none; margin: 0; padding: 0; height: 100%; }
+.menu > li { display: flex; align-items: center; height: 100%; }
+.menu > li > a { font-size: 14px; }
+.menu > li > a:hover,
+.menu > li.open > a,
+.menu > li > a.current { background-size: 100% 2px; }
+
+/* Dropdown panel: hangs under the bar, full width, same gray */
+.panel {
+  position: absolute;
+  left: 0; right: 0; top: var(--bar-h);
+  background: var(--band);
+  border-bottom: 1px solid var(--line);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 150ms ease, visibility 0s linear 150ms;
+}
+.has-sub.open .panel { opacity: 1; visibility: visible; transition: opacity 150ms ease; }
+.panel-inner { padding-top: 18px; padding-bottom: 26px; }
+.panel ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
+.panel a { font-size: 17px; font-weight: 500; letter-spacing: -0.01em; }
+.panel a:hover,
+.panel a.current { background-size: 100% 2px; }
+
+/* Page behind an open dropdown: softly blurred and faded (Apple-like focus effect) */
+main, footer { transition: filter 200ms ease, opacity 200ms ease; }
+body.menu-open main,
+body.menu-open footer { filter: blur(6px); opacity: 0.55; }
+
+/* ---------- Shared text styles ---------- */
+main { flex: 1; }
+h1 {
+  font-size: calc(var(--fs) * 2.1);
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+  margin: 0 0 calc(var(--fs) * 0.9);
+}
+.prose { font-size: var(--fs); line-height: 1.55; }
+.prose p { margin: 0 0 1em; }                 /* a clear space between paragraphs */
+.prose p:last-child { margin-bottom: 0; }
+.prose ul { list-style: none; padding: 0; }
+.prose li { padding-left: 1.4em; position: relative; }
+/* Bullets: small red squares */
+.prose li::before {
+  content: "";
+  position: absolute;
+  left: 0.15em;
+  top: 0.62em;
+  width: 0.38em;
+  height: 0.38em;
+  background: var(--red);
+}
+/* Links in running text (option E): faint gray underline at rest, red and thicker on hover,
+   plus a small ↗ for links that leave the site */
+.prose a {
+  word-break: break-word;
+  text-decoration: underline;
+  text-decoration-color: var(--link-line);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.25em;
+  transition: text-decoration-color 150ms ease;
+}
+.prose a:hover { text-decoration-color: var(--red); text-decoration-thickness: 2px; }
+.prose a[href^="http"]::after {
+  content: "\2009↗";
+  display: inline-block;     /* keeps the arrow out of the underline */
+  font-size: 0.8em;
+  color: var(--text-2);
+}
+
+/* ---------- HOME ---------- */
+.home main {
+  padding-top: clamp(16px, 4.5vh, 64px);
+  padding-bottom: clamp(12px, 3vh, 40px);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: clamp(48px, 5vw, 80px);          /* reading space between the text and the photo */
+}
+.home .text { min-width: 0; flex: 1; }
+.home h1 .pron { font-size: 0.5em; font-weight: 400; color: var(--text-2); letter-spacing: 0; margin-left: 0.35em; }
+.home .prose ul { margin: -0.4em 0 1em; }      /* list stays close to its "My main research areas are:" line */
+.home .prose li { margin-bottom: 0.15em; }
+/* iOS-like portrait: rounded rectangle, top edge level with the name */
+.portrait { margin: 0; flex: none; align-self: flex-start; width: clamp(180px, 17vw, 260px); aspect-ratio: 4 / 5; }
+.portrait img { width: 100%; height: 100%; object-fit: cover; border-radius: 20px; display: block; background: var(--band); }
+
+/* ---------- TOPIC PAGES (one page per research area) ---------- */
+.topic main { padding-top: clamp(24px, 6vh, 72px); padding-bottom: 72px; }
+/* Description on the left; image centred in the space to its right; top edges level */
+.topic-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: clamp(48px, 5vw, 80px);
+  align-items: start;
+}
+.topic-img { margin: 0; justify-self: center; width: clamp(240px, 24vw, 360px); aspect-ratio: 1 / 1; }
+.topic-img img { width: 100%; height: 100%; object-fit: cover; border-radius: 20px; display: block; background: var(--band); }
+/* "Selected publications": bold and a little larger than body text, so the section stands out */
+.pubs { margin-top: clamp(40px, 7vh, 72px); }
+.pubs h2 {
+  font-size: calc(var(--fs) * 1.35);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+  margin: 0 0 calc(var(--fs) * 0.9);
+}
+.pub-list { margin: 0; padding: 0; list-style: none; }
+.pub-list li { margin-bottom: 0.9em; }
+.pub-list li:last-child { margin-bottom: 0; }
+
+/* ---------- Footer ---------- */
+footer { flex: none; border-top: 1px solid var(--line); }
+.foot-inner { padding-top: 10px; padding-bottom: 10px; display: flex; justify-content: space-between; gap: 16px; font-size: 13px; color: var(--text-2); }
+.foot-inner a:hover { color: var(--text); background-size: 100% 1px; }
+
+/* ---------- Phone menu (hidden on laptop/desktop) ---------- */
+.menu-btn { display: none; }
+.mnav { display: none; }
+
+/* Below ~980px the five menu items no longer fit in one row: switch to the menu icon */
+@media (max-width: 980px) {
+  nav[aria-label="Main"] { display: none; }
+
+  /* Menu icon: two short lines (Apple-style); becomes an × when the menu is open */
+  .menu-btn {
+    display: flex; align-items: center; justify-content: center;
+    width: 44px; height: 44px; margin-right: -12px;
+    background: none; border: 0; padding: 0; cursor: pointer; color: var(--text);
+  }
+  .menu-btn span { position: relative; display: block; width: 18px; height: 8px; }
+  .menu-btn span::before, .menu-btn span::after {
+    content: ""; position: absolute; left: 0; width: 18px; height: 1.5px; background: currentColor; border-radius: 1px;
+  }
+  .menu-btn span::before { top: 0; }
+  .menu-btn span::after { bottom: 0; }
+  body.mnav-open .menu-btn span::before { top: 3.25px; transform: rotate(45deg); }
+  body.mnav-open .menu-btn span::after { bottom: 3.25px; transform: rotate(-45deg); }
+
+  /* Menu panel under the bar, same light gray, only as tall as its items;
+     scrolls on its own if it ever gets taller than the screen */
+  .mnav {
+    display: block;
+    position: fixed; left: 0; right: 0; top: var(--bar-h);
+    max-height: calc(100vh - var(--bar-h));
+    max-height: calc(100dvh - var(--bar-h));
+    z-index: 9;
+    background: var(--band);
+    border-bottom: 1px solid var(--line);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 4px var(--edge) 8px;
+    opacity: 0; visibility: hidden;
+    transition: opacity 150ms ease, visibility 0s linear 150ms;
+  }
+  body.mnav-open .mnav { opacity: 1; visibility: visible; transition: opacity 150ms ease; }
+  body.mnav-open { overflow: hidden; }
+
+  /* Page behind the open phone menu: blurred and faded, same as the laptop dropdown */
+  body.mnav-open main,
+  body.mnav-open footer { filter: blur(6px); opacity: 0.55; }
+
+  .mnav ul { list-style: none; margin: 0; padding: 0; }
+  .mnav > nav > ul > li + li { border-top: 1px solid var(--line); }
+  .mnav .row { display: flex; align-items: center; justify-content: space-between; min-height: 60px; }
+  .mnav .row > a { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; }
+  .mnav .row > a.current,
+  .mnav .row > a:active { background-size: 100% 2px; }
+
+  /* Rows with sub-menus: the whole row (text + arrow) is one button that folds the sub-menu out */
+  .row-btn {
+    width: 100%;
+    background: none; border: 0; padding: 0; margin: 0; cursor: pointer;
+    font: inherit; color: var(--text); text-align: left;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .row-btn .label { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; }
+  .row-btn:active .label,
+  .row-btn .label.current,
+  .row-btn[aria-expanded="true"] .label { background-size: 100% 2px; }
+  .row-btn .chev {
+    width: 32px; text-align: center; margin-right: -6px;
+    font-size: 26px; line-height: 1; color: var(--text-2);
+    transition: transform 200ms ease;
+  }
+  .row-btn[aria-expanded="true"] .chev { transform: rotate(90deg); color: var(--text); }
+  .mnav .sub { display: none; padding: 0 0 18px; }
+  .mnav .sub.open { display: block; }
+  .mnav .sub li { padding: 7px 0; }
+  .mnav .sub a { font-size: 18px; font-weight: 500; letter-spacing: -0.01em; }
+  .mnav .sub a.current,
+  .mnav .sub a:active { background-size: 100% 2px; }
+}
+
+/* ---------- Phone layout ---------- */
+@media (max-width: 760px) {
+  :root { --fs: 17px; }
+  .foot-inner { flex-direction: column; gap: 4px; padding-top: 14px; padding-bottom: 18px; }
+
+  /* HOME: name → photo → text */
+  .home main { flex-direction: column; align-items: stretch; gap: 0; padding-top: 28px; padding-bottom: 36px; }
+  .home .text { display: contents; }          /* lets the photo sit between the name and the text */
+  /* Name always on one line (the script sizes it to the screen); (she/her) on its own small gray line below */
+  .home h1 { order: 1; font-size: var(--name-fs, 26px); margin-bottom: 20px; }
+  .home h1 .name { white-space: nowrap; }
+  .home h1 .pron { display: block; margin: 6px 0 0; font-size: 15px; }
+  .portrait { order: 2; width: 60%; max-width: 280px; margin: 0 0 24px; align-self: center; }
+  .home .prose { order: 3; }
+
+  /* TOPIC PAGES: title → image (centred) → description → publications */
+  .topic main { padding-top: 28px; padding-bottom: 40px; }
+  .topic h1 { font-size: 28px; margin-bottom: 20px; }
+  .topic-top { display: flex; flex-direction: column; gap: 24px; }
+  .topic-img { order: -1; width: 70%; max-width: 300px; align-self: center; }
+  .pubs { margin-top: 40px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .u-red, .panel, main, footer, .mnav, .row-btn .chev { transition: none !important; }
+}

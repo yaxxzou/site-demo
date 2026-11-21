@@ -8,248 +8,24 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
-<style>
-  :root {
-    --text: #1D1D1F;
-    --text-2: #6E6E73;
-    --line: #D2D2D7;
-    --band: #F5F5F7;
-    --red: #D6002B;
-    --fs: 18px;                          /* body size on Home; the fit script may lower it */
-    --bar-h: 48px;
-    --edge: clamp(24px, 4vw, 64px);      /* space between the window edge and the content */
-    --max: 1440px;                       /* on very wide screens everything centres */
-  }
-  * { box-sizing: border-box; }
-  html, body { margin: 0; }
-  body {
-    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    color: var(--text);
-    background: #fff;
-    -webkit-font-smoothing: antialiased;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-  a { color: inherit; text-decoration: none; }
-  .wrap { max-width: var(--max); margin: 0 auto; padding-left: var(--edge); padding-right: var(--edge); width: 100%; }
-
-  /* Red underline drawn as a background, so it can slide in */
-  .u-red {
-    background-image: linear-gradient(var(--red), var(--red));
-    background-repeat: no-repeat;
-    background-position: 0 100%;
-    background-size: 0% 2px;
-    transition: background-size 200ms ease;
-    padding-bottom: 3px;
-  }
-
-  /* ---------- Top bar ---------- */
-  .bar { position: sticky; top: 0; z-index: 10; background: var(--band); height: var(--bar-h); flex: none; }
-  .bar-inner { height: 100%; display: flex; align-items: center; justify-content: space-between; }
-  .site-name { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
-  nav { height: 100%; }
-  .menu { display: flex; gap: 44px; list-style: none; margin: 0; padding: 0; height: 100%; }
-  .menu > li { display: flex; align-items: center; height: 100%; }
-  .menu > li > a { font-size: 14px; }
-  .menu > li > a:hover,
-  .menu > li.open > a,
-  .menu > li > a.current { background-size: 100% 2px; }
-
-  /* Dropdown panel: hangs under the bar, full width, same gray */
-  .panel {
-    position: absolute;
-    left: 0; right: 0; top: var(--bar-h);
-    background: var(--band);
-    border-bottom: 1px solid var(--line);
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 150ms ease, visibility 0s linear 150ms;
-  }
-  .has-sub.open .panel { opacity: 1; visibility: visible; transition: opacity 150ms ease; }
-  .panel-inner { padding-top: 18px; padding-bottom: 26px; }
-  .panel ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
-  .panel a { font-size: 17px; font-weight: 500; letter-spacing: -0.01em; }
-  .panel a:hover { background-size: 100% 2px; }
-
-  /* Page behind an open dropdown: softly blurred and faded (trial, Apple-like focus effect) */
-  main, footer { transition: filter 200ms ease, opacity 200ms ease; }
-  body.menu-open main,
-  body.menu-open footer { filter: blur(6px); opacity: 0.55; }
-
-  /* ---------- Home content ---------- */
-  main {
-    flex: 1;
-    padding-top: clamp(16px, 4.5vh, 64px);
-    padding-bottom: clamp(12px, 3vh, 40px);
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: clamp(48px, 5vw, 80px);          /* reading space between the text and the photo */
-  }
-  .text { min-width: 0; flex: 1; }
-  h1 {
-    font-size: calc(var(--fs) * 2.1);
-    font-weight: 700;
-    letter-spacing: -0.025em;
-    line-height: 1.1;
-    margin: 0 0 calc(var(--fs) * 0.9);
-  }
-  h1 .pron { font-size: 0.5em; font-weight: 400; color: var(--text-2); letter-spacing: 0; margin-left: 0.35em; }
-  .intro { font-size: var(--fs); line-height: 1.55; }
-  .intro p { margin: 0 0 1em; }             /* a clear space between paragraphs */
-  .intro p:last-child { margin-bottom: 0; }
-  .intro ul { list-style: none; margin: -0.4em 0 1em; padding: 0; }   /* list stays close to its "My main research areas are:" line */
-  .intro li { padding-left: 1.4em; position: relative; margin-bottom: 0.15em; }
-  /* Bullets: small red squares (replacing the ✶ stars) */
-  .intro li::before {
-    content: "";
-    position: absolute;
-    left: 0.15em;
-    top: 0.62em;
-    width: 0.38em;
-    height: 0.38em;
-    background: var(--red);
-  }
-
-  /* Links in running text (option E): faint gray underline at rest, red and thicker on hover,
-     plus a small ↗ for links that leave the site */
-  .intro a {
-    word-break: break-word;
-    text-decoration: underline;
-    text-decoration-color: #B8B8BE;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 0.25em;
-    transition: text-decoration-color 150ms ease;
-  }
-  .intro a:hover { text-decoration-color: var(--red); text-decoration-thickness: 2px; }
-  .intro a[href^="http"]::after {
-    content: "\2009↗";
-    display: inline-block;     /* keeps the arrow out of the underline */
-    font-size: 0.8em;
-    color: var(--text-2);
-  }
-
-  /* Smaller, iOS-like portrait: rounded rectangle, sits top-right in line with the title */
-  .portrait { margin: 0; flex: none; align-self: flex-start; width: clamp(180px, 17vw, 260px); aspect-ratio: 4 / 5; }
-  .portrait img { width: 100%; height: 100%; object-fit: cover; border-radius: 20px; display: block; background: var(--band); }
-
-  /* ---------- Footer ---------- */
-  footer { flex: none; border-top: 1px solid var(--line); }
-  .foot-inner { padding-top: 10px; padding-bottom: 10px; display: flex; justify-content: space-between; gap: 16px; font-size: 13px; color: var(--text-2); }
-  .foot-inner a:hover { color: var(--text); background-size: 100% 1px; }
-
-  /* ---------- Phone menu (hidden on laptop/desktop) ---------- */
-  .menu-btn { display: none; }
-  .mnav { display: none; }
-
-  /* Below ~980px the five menu items no longer fit in one row: switch to the menu icon */
-  @media (max-width: 980px) {
-    nav[aria-label="Main"] { display: none; }
-
-    /* Menu icon: two short lines (Apple-style); becomes an × when the menu is open */
-    .menu-btn {
-      display: flex; align-items: center; justify-content: center;
-      width: 44px; height: 44px; margin-right: -12px;
-      background: none; border: 0; padding: 0; cursor: pointer; color: var(--text);
-    }
-    .menu-btn span { position: relative; display: block; width: 18px; height: 8px; }
-    .menu-btn span::before, .menu-btn span::after {
-      content: ""; position: absolute; left: 0; width: 18px; height: 1.5px; background: currentColor; border-radius: 1px;
-    }
-    .menu-btn span::before { top: 0; }
-    .menu-btn span::after { bottom: 0; }
-    body.mnav-open .menu-btn span::before { top: 3.25px; transform: rotate(45deg); }
-    body.mnav-open .menu-btn span::after { bottom: 3.25px; transform: rotate(-45deg); }
-
-    /* Menu panel under the bar, same light gray, only as tall as its items;
-       scrolls on its own if it ever gets taller than the screen */
-    .mnav {
-      display: block;
-      position: fixed; left: 0; right: 0; top: var(--bar-h);
-      max-height: calc(100vh - var(--bar-h));
-      max-height: calc(100dvh - var(--bar-h));
-      z-index: 9;
-      background: var(--band);
-      border-bottom: 1px solid var(--line);
-      overflow-y: auto;
-      overscroll-behavior: contain;
-      padding: 4px var(--edge) 8px;
-      opacity: 0; visibility: hidden;
-      transition: opacity 150ms ease, visibility 0s linear 150ms;
-    }
-    body.mnav-open .mnav { opacity: 1; visibility: visible; transition: opacity 150ms ease; }
-    body.mnav-open { overflow: hidden; }
-
-    /* Page behind the open phone menu: blurred and faded, same as the laptop dropdown */
-    body.mnav-open main,
-    body.mnav-open footer { filter: blur(6px); opacity: 0.55; }
-
-    .mnav ul { list-style: none; margin: 0; padding: 0; }
-    .mnav > nav > ul > li + li { border-top: 1px solid var(--line); }
-    .mnav .row { display: flex; align-items: center; justify-content: space-between; min-height: 60px; }
-    .mnav .row > a { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; }
-    .mnav .row > a.current,
-    .mnav .row > a:active { background-size: 100% 2px; }
-
-    /* Rows with sub-menus: the whole row (text + arrow) is one button that folds the sub-menu out */
-    .row-btn {
-      width: 100%;
-      background: none; border: 0; padding: 0; margin: 0; cursor: pointer;
-      font: inherit; color: var(--text); text-align: left;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .row-btn .label { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; }
-    .row-btn:active .label,
-    .row-btn[aria-expanded="true"] .label { background-size: 100% 2px; }
-    .row-btn .chev {
-      width: 32px; text-align: center; margin-right: -6px;
-      font-size: 26px; line-height: 1; color: var(--text-2);
-      transition: transform 200ms ease;
-    }
-    .row-btn[aria-expanded="true"] .chev { transform: rotate(90deg); color: var(--text); }
-    .mnav .sub { display: none; padding: 0 0 18px; }
-    .mnav .sub.open { display: block; }
-    .mnav .sub li { padding: 7px 0; }
-    .mnav .sub a { font-size: 18px; font-weight: 500; letter-spacing: -0.01em; }
-    .mnav .sub a:active { background-size: 100% 2px; }
-  }
-
-  /* ---------- Phone layout ---------- */
-  @media (max-width: 760px) {
-    main { flex-direction: column; align-items: stretch; gap: 0; padding-top: 28px; padding-bottom: 36px; }
-    .text { display: contents; }          /* lets the photo sit between the name and the text */
-    /* Name always on one line (the script sizes it to the screen); (she/her) on its own small gray line below */
-    h1 { order: 1; font-size: var(--name-fs, 26px); margin-bottom: 20px; }
-    h1 .name { white-space: nowrap; }
-    h1 .pron { display: block; margin: 6px 0 0; font-size: 15px; }
-    .portrait { order: 2; width: 60%; max-width: 280px; margin: 0 0 24px; align-self: center; }
-    .intro { order: 3; }
-    .foot-inner { flex-direction: column; gap: 4px; padding-top: 14px; padding-bottom: 18px; }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .u-red, .panel, main, footer, .mnav, .row-btn .chev { transition: none !important; }
-  }
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="home">
 
 <header class="bar">
   <div class="wrap bar-inner">
-    <a class="site-name" href="#" data-home>Sandra Grinschgl</a>
+    <a class="site-name" href="index.html">Sandra Grinschgl</a>
     <nav aria-label="Main">
       <ul class="menu">
-        <li><a class="u-red current" href="#" data-home>Home</a></li>
+        <li><a class="u-red current" href="index.html">Home</a></li>
         <li class="has-sub">
-          <a class="u-red" href="#">Research Areas</a>
+          <a class="u-red" href="#" data-parent>Research Areas</a>
           <div class="panel">
             <div class="wrap panel-inner">
               <ul>
-                <li><a class="u-red" href="#">Human-Technology Interaction</a></li>
+                <li><a class="u-red" href="human-technology-interaction.html">Human-Technology Interaction</a></li>
                 <li><a class="u-red" href="#">Cognitive Enhancement</a></li>
                 <li><a class="u-red" href="#">Metacognition</a></li>
-                <li><a class="u-red" href="#">Open Science</a></li>
               </ul>
             </div>
           </div>
@@ -263,21 +39,20 @@
   </div>
 </header>
 
-<!-- Phone menu: full-screen sheet opened by the menu icon -->
+<!-- Phone menu: panel opened by the menu icon -->
 <div class="mnav" id="mnav">
   <nav aria-label="Main (phone)">
     <ul>
-      <li><div class="row"><a class="u-red current" href="#" data-home>Home</a></div></li>
+      <li><div class="row"><a class="u-red current" href="index.html">Home</a></div></li>
       <li>
         <button class="row row-btn" type="button" aria-expanded="false" aria-controls="sub-research">
           <span class="label u-red">Research Areas</span>
           <span class="chev" aria-hidden="true">›</span>
         </button>
         <ul class="sub" id="sub-research">
-          <li><a class="u-red" href="#">Human-Technology Interaction</a></li>
+          <li><a class="u-red" href="human-technology-interaction.html">Human-Technology Interaction</a></li>
           <li><a class="u-red" href="#">Cognitive Enhancement</a></li>
           <li><a class="u-red" href="#">Metacognition</a></li>
-          <li><a class="u-red" href="#">Open Science</a></li>
         </ul>
       </li>
       <li><div class="row"><a class="u-red" href="#">Curriculum Vitae</a></div></li>
@@ -290,7 +65,7 @@
 <main class="wrap">
   <div class="text">
     <h1><span class="name">PD Dr. Sandra Grinschgl</span><span class="pron">(she/her)</span></h1>
-    <div class="intro">
+    <div class="prose">
       <p>My Name is Sandra Grinschgl (she/her) and I’m a researcher and lecturer at the University of Bern, Switzerland.</p>
       <p>My main research areas are:</p>
       <ul>
@@ -316,103 +91,6 @@
   </div>
 </footer>
 
-<script>
-  // Mockup only: clicking a menu item marks it as the current page (instead of navigating),
-  // so the "current page" red underline can be seen. "Home" and the name mark Home.
-  const menuLinks = document.querySelectorAll('.menu > li > a');
-  const homeLink = document.querySelector('.menu a[data-home]');
-  function setCurrent(a) { menuLinks.forEach(x => x.classList.remove('current')); a.classList.add('current'); }
-  menuLinks.forEach(a => a.addEventListener('click', e => { e.preventDefault(); setCurrent(a); }));
-  document.querySelector('.site-name').addEventListener('click', e => { e.preventDefault(); setCurrent(homeLink); });
-  document.querySelectorAll('.panel a').forEach(a => a.addEventListener('click', e => e.preventDefault()));
-
-  // Dropdown: opens on hover, stays open while the mouse is on the item or the panel,
-  // and waits a moment before closing so small mouse movements don't shut it.
-  document.querySelectorAll('.has-sub').forEach(li => {
-    let timer;
-    const open = () => { clearTimeout(timer); li.classList.add('open'); document.body.classList.add('menu-open'); };
-    const close = () => { timer = setTimeout(() => { li.classList.remove('open'); document.body.classList.remove('menu-open'); }, 250); };
-    li.addEventListener('mouseenter', open);
-    li.addEventListener('mouseleave', close);
-    li.addEventListener('focusin', open);
-    li.addEventListener('focusout', close);
-  });
-
-  // Phone menu: the icon opens/closes the full-screen sheet
-  const menuBtn = document.querySelector('.menu-btn');
-  function setMenu(open) {
-    document.body.classList.toggle('mnav-open', open);
-    menuBtn.setAttribute('aria-expanded', String(open));
-    menuBtn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
-  }
-  menuBtn.addEventListener('click', () => setMenu(!document.body.classList.contains('mnav-open')));
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false); });
-  // Tapping the blurred page closes the menu (and doesn't follow a link hidden under the blur)
-  document.addEventListener('click', e => {
-    if (!document.body.classList.contains('mnav-open')) return;
-    if (e.target.closest('.mnav, .bar')) return;
-    e.preventDefault();
-    e.stopPropagation();
-    setMenu(false);
-  }, true);
-  window.addEventListener('resize', () => { if (window.innerWidth > 980) setMenu(false); });
-
-  // Tapping anywhere on the "Research Areas" row (text or arrow) folds its sub-menu out / in
-  document.querySelectorAll('.row-btn').forEach(btn => btn.addEventListener('click', () => {
-    const sub = document.getElementById(btn.getAttribute('aria-controls'));
-    const open = btn.getAttribute('aria-expanded') !== 'true';
-    btn.setAttribute('aria-expanded', String(open));
-    sub.classList.toggle('open', open);
-  }));
-
-  // Mockup only: tapping a phone-menu item marks it current and closes the menu
-  const mLinks = document.querySelectorAll('.mnav .row > a');
-  document.querySelectorAll('.mnav a').forEach(a => a.addEventListener('click', e => {
-    e.preventDefault();
-    if (a.closest('.row')) { mLinks.forEach(x => x.classList.remove('current')); a.classList.add('current'); }
-    setMenu(false);
-  }));
-
-  // Line up the dropdown list under its menu item
-  function alignPanel() {
-    document.querySelectorAll('.has-sub').forEach(li => {
-      const ul = li.querySelector('.panel ul');
-      const inner = li.querySelector('.panel-inner');
-      const offset = li.querySelector('a').getBoundingClientRect().left - inner.getBoundingClientRect().left
-                     - parseFloat(getComputedStyle(inner).paddingLeft);
-      ul.style.marginLeft = Math.max(0, offset) + 'px';
-    });
-  }
-
-  // Fit Home on one screen (laptop/desktop): shrink the body size step by step until nothing scrolls
-  function fitHome() {
-    const root = document.documentElement;
-    let fs = window.innerWidth <= 760 ? 17 : 18;   // phones: 17px and normal scrolling
-    root.style.setProperty('--fs', fs + 'px');
-    if (window.innerWidth <= 760) return;
-    while (root.scrollHeight > window.innerHeight && fs > 14) {
-      fs -= 0.25;
-      root.style.setProperty('--fs', fs + 'px');
-    }
-  }
-
-  // Phones: size the name so "PD Dr. Sandra Grinschgl" fits on one line (max 30px, min 18px)
-  function fitName() {
-    const h1 = document.querySelector('h1'), name = h1.querySelector('.name');
-    if (window.innerWidth > 760) { h1.style.removeProperty('--name-fs'); return; }
-    let size = 30;
-    h1.style.setProperty('--name-fs', size + 'px');
-    while (name.getBoundingClientRect().width > h1.clientWidth && size > 18) {
-      size -= 0.5;
-      h1.style.setProperty('--name-fs', size + 'px');
-    }
-  }
-
-  function layout() { fitHome(); fitName(); alignPanel(); }
-  window.addEventListener('resize', layout);
-  window.addEventListener('load', layout);
-  document.fonts.ready.then(layout);
-  layout();
-</script>
+<script src="site.js"></script>
 </body>
 </html>
