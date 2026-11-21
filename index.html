@@ -219,7 +219,10 @@
   @media (max-width: 760px) {
     main { flex-direction: column; align-items: stretch; gap: 0; padding-top: 28px; padding-bottom: 36px; }
     .text { display: contents; }          /* lets the photo sit between the name and the text */
-    h1 { order: 1; font-size: calc(var(--fs) * 1.75); margin-bottom: 20px; }
+    /* Name always on one line (the script sizes it to the screen); (she/her) on its own small gray line below */
+    h1 { order: 1; font-size: var(--name-fs, 26px); margin-bottom: 20px; }
+    h1 .name { white-space: nowrap; }
+    h1 .pron { display: block; margin: 6px 0 0; font-size: 15px; }
     .portrait { order: 2; width: 60%; max-width: 280px; margin: 0 0 24px; align-self: center; }
     .intro { order: 3; }
     .foot-inner { flex-direction: column; gap: 4px; padding-top: 14px; padding-bottom: 18px; }
@@ -286,7 +289,7 @@
 
 <main class="wrap">
   <div class="text">
-    <h1>PD Dr. Sandra Grinschgl<span class="pron">(she/her)</span></h1>
+    <h1><span class="name">PD Dr. Sandra Grinschgl</span><span class="pron">(she/her)</span></h1>
     <div class="intro">
       <p>My Name is Sandra Grinschgl (she/her) and I’m a researcher and lecturer at the University of Bern, Switzerland.</p>
       <p>My main research areas are:</p>
@@ -393,7 +396,19 @@
     }
   }
 
-  function layout() { fitHome(); alignPanel(); }
+  // Phones: size the name so "PD Dr. Sandra Grinschgl" fits on one line (max 30px, min 18px)
+  function fitName() {
+    const h1 = document.querySelector('h1'), name = h1.querySelector('.name');
+    if (window.innerWidth > 760) { h1.style.removeProperty('--name-fs'); return; }
+    let size = 30;
+    h1.style.setProperty('--name-fs', size + 'px');
+    while (name.getBoundingClientRect().width > h1.clientWidth && size > 18) {
+      size -= 0.5;
+      h1.style.setProperty('--name-fs', size + 'px');
+    }
+  }
+
+  function layout() { fitHome(); fitName(); alignPanel(); }
   window.addEventListener('resize', layout);
   window.addEventListener('load', layout);
   document.fonts.ready.then(layout);
