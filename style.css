@@ -8,7 +8,9 @@
   --band: #F5F5F7;
   --red: #D6002B;
   --link-line: #B8B8BE;
-  --fs: 18px;                          /* body text size; Home's fit script may lower it */
+  /* Body text size, the same rule on every page: 18px on screens 820px+ tall, scaling down
+     to 15px on small laptops (650px tall). Home's fit script may go a little lower if needed. */
+  --fs: clamp(15px, calc(15px + (100vh - 650px) * 0.0176), 18px);
   --bar-h: 48px;
   --edge: clamp(24px, 4vw, 64px);      /* space between the window edge and the content */
   --max: 1440px;                       /* on very wide screens everything centres */
@@ -78,7 +80,7 @@ h1 {
   font-weight: 700;
   letter-spacing: -0.025em;
   line-height: 1.1;
-  margin: 0 0 calc(var(--fs) * 0.9);
+  margin: 0 0 calc(var(--fs) * 1.7);     /* breathing room between the title and the first paragraph */
 }
 .prose { font-size: var(--fs); line-height: 1.55; }
 .prose p { margin: 0 0 1em; }                 /* a clear space between paragraphs */

@@ -69,7 +69,8 @@ function fitHome() {
   const root = document.documentElement;
   root.style.removeProperty('--fs');
   if (window.innerWidth <= 760) return;        // phones: normal scrolling
-  let fs = 18;
+  // Start from the shared size rule (same as every other page), shrink only if Home doesn't fit
+  let fs = parseFloat(getComputedStyle(document.querySelector('.prose')).fontSize);
   root.style.setProperty('--fs', fs + 'px');
   while (root.scrollHeight > window.innerHeight && fs > 14) {
     fs -= 0.25;
