@@ -162,22 +162,31 @@
     body.mnav-open .menu-btn span::before { top: 3.25px; transform: rotate(45deg); }
     body.mnav-open .menu-btn span::after { bottom: 3.25px; transform: rotate(-45deg); }
 
-    /* Full-screen menu sheet under the bar, same light gray */
+    /* Menu panel under the bar, same light gray, only as tall as its items;
+       scrolls on its own if it ever gets taller than the screen */
     .mnav {
       display: block;
-      position: fixed; left: 0; right: 0; top: var(--bar-h); bottom: 0;
+      position: fixed; left: 0; right: 0; top: var(--bar-h);
+      max-height: calc(100vh - var(--bar-h));
+      max-height: calc(100dvh - var(--bar-h));
       z-index: 9;
       background: var(--band);
+      border-bottom: 1px solid var(--line);
       overflow-y: auto;
-      padding: 12px var(--edge) 40px;
+      overscroll-behavior: contain;
+      padding: 4px var(--edge) 8px;
       opacity: 0; visibility: hidden;
       transition: opacity 150ms ease, visibility 0s linear 150ms;
     }
     body.mnav-open .mnav { opacity: 1; visibility: visible; transition: opacity 150ms ease; }
     body.mnav-open { overflow: hidden; }
 
+    /* Page behind the open phone menu: blurred and faded, same as the laptop dropdown */
+    body.mnav-open main,
+    body.mnav-open footer { filter: blur(6px); opacity: 0.55; }
+
     .mnav ul { list-style: none; margin: 0; padding: 0; }
-    .mnav > ul > li { border-bottom: 1px solid var(--line); }
+    .mnav > nav > ul > li + li { border-top: 1px solid var(--line); }
     .mnav .row { display: flex; align-items: center; justify-content: space-between; min-height: 60px; }
     .mnav .row > a { font-size: 24px; font-weight: 600; letter-spacing: -0.02em; }
     .mnav .row > a.current,
@@ -335,6 +344,14 @@
   }
   menuBtn.addEventListener('click', () => setMenu(!document.body.classList.contains('mnav-open')));
   document.addEventListener('keydown', e => { if (e.key === 'Escape') setMenu(false); });
+  // Tapping the blurred page closes the menu (and doesn't follow a link hidden under the blur)
+  document.addEventListener('click', e => {
+    if (!document.body.classList.contains('mnav-open')) return;
+    if (e.target.closest('.mnav, .bar')) return;
+    e.preventDefault();
+    e.stopPropagation();
+    setMenu(false);
+  }, true);
   window.addEventListener('resize', () => { if (window.innerWidth > 980) setMenu(false); });
 
   // Tapping anywhere on the "Research Areas" row (text or arrow) folds its sub-menu out / in
